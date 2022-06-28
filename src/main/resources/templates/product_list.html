@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+<title>문제 1</title>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css" th:href="@{/css/bootstrap.min.css}">
+<script th:src="@{/js/bootstrap.min.js}"></script>
+<script th:src="@{/js/jquery.js}"></script>
+<script type="text/javascript">
+$(window).on('load', function(){
+	$("#container").removeClass("opacity-50"); $("#container").removeAttr("style");
+	$("#spinner").removeClass("d-flex"); $("#spinner").hide();
+});
+</script>
+</head>
+<body>
+<div id="container" class="container-fluid opacity-50" style="pointer-events:none;">
+	<nav class="navbar navbar-light bg-light">
+		<a class="navbar-brand" href="search"><img src="/image/logo.png" width="60"></a>
+	</nav>
+	<div id="spinner" class="p-3 d-flex justify-content-center">
+		<div class="spinner-border" role="status">
+			<span class="visually-hidden">Loading...</span>
+		</div>
+	</div>
+	<div th:if="${#lists.isEmpty(list)} and ${product == null}" aria-live="polite" aria-atomic="true" class="d-flex justify-content-center align-items-center w-100 h-50">
+		<div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+			<div class="d-flex">
+				<div class="toast-body">검색 정보가 존재하지 않습니다.. <a href="search" class="alert-link">다시 검색</a></div>
+	    		<button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+			</div>
+		</div>
+	</div>
+	<div class="row gx-5">
+		<div th:if="${product != null}" class="col-sm-2">
+			<div class="d-flex flex-column">
+				<div class="p-2"><img class="img-thumbnail" th:src="${product.imageUrl}"></div>
+				<div th:if="${product.getCategory != null}" class="p-2">
+					<div class="p-2"><strong>ITEMS</strong></div>
+					<div class="p-2"><button class="btn btn-sm btn-dark" type="button" th:text="${#strings.substringAfter(product.getCategory[0], '.').toUpperCase()}"></button></div>
+				</div>
+				<div th:if="${region != null} and ${region.attributes} != null" class="p-2">
+					<div class="p-2"><strong>ATTRIBUTES</strong></div>
+					<th:block th:each="attribute : ${region.attributes.data}">
+						<div th:each="key : ${attribute.keySet()}" class="p-2 btn-group-sm btn-group-vertical">
+							<button class="btn btn-dark text-start" type="button" th:text="'#' + ${key}"></button>
+							<button class="btn btn-outline-dark text-start" type="button" th:text="${attribute.get(key)}"></button>
+						</div>
+					</th:block>	
+				</div>
+			</div>
+		</div >
+		<div th:unless="${#lists.isEmpty(list)}" class="col">
+			<div class="d-flex flex-wrap">
+				<div th:each="item : ${list}" class="p-2 card">
+					<a th:href="${product != null} ? @{/product/list(query=${item.code})} : ${item.imageUrl}" th:target="${product != null} ? _self : _blank">
+						<img class="card-img-top" th:src="${item.imageUrl}" style="width: 8rem; height: 10rem;">
+					</a>
+					<div class="card-body">
+						<h7 class="card-title" th:text="${item.name}"></h7>
+						<p class="card-text text-end"><small class="text-muted" th:text="${#numbers.formatCurrency(item.price)}"></small></p>
+				    </div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+</body>
+</html>
